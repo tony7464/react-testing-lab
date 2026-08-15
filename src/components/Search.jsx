@@ -1,5 +1,6 @@
 import React from "react";
 
+// Updates search text in AccountContainer so the list can be filtered
 function Search({setSearch}) {
   return (
     <div className="ui large fluid icon input">
