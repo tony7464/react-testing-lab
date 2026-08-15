@@ -48,10 +48,13 @@ function AccountContainer() {
     });
 
   return (
-    <div>
+    <div className="account">
       <Search setSearch={setSearch} />
       <AddTransactionForm postTransaction={postTransaction} />
-      <Sort onSort={onSort} />
+      <div className="toolbar">
+        <h3>Recent activity</h3>
+        <Sort onSort={onSort} />
+      </div>
       <TransactionsList transactions={displayedTransactions} />
     </div>
   );

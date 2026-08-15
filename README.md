@@ -50,6 +50,4 @@ The suite covers:
 
 ## Screenshot
 
-![App screenshot](./screenshot.png)
-
-*Add `screenshot.png` to the project root after capturing the running app (search, sort, and transaction table visible).*
+![The Royal Bank of Flatiron app showing search, add transaction, and recent activity](./screenshot.png)
