@@ -1,3 +1,4 @@
+// Lets the user sort the table by description or category
 function Sort({onSort}){
     return(
         <select onChange={(e)=>{
