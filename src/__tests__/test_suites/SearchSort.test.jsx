@@ -26,6 +26,17 @@ const mockTransactions = [
   },
 ];
 
+async function searchFor(user, text) {
+  const searchInput = screen.getByPlaceholderText(
+    "Search your Recent Transactions"
+  );
+  await user.clear(searchInput);
+  if (text) {
+    await user.type(searchInput, text);
+  }
+  return searchInput;
+}
+
 describe("Search and Sort Transactions", () => {
   beforeEach(() => {
     setFetchResponse(mockTransactions);
@@ -36,11 +47,7 @@ describe("Search and Sort Transactions", () => {
     render(<App />);
 
     await screen.findByText("Chipotle");
-
-    const searchInput = screen.getByPlaceholderText(
-      "Search your Recent Transactions"
-    );
-    await user.type(searchInput, "Chipotle");
+    await searchFor(user, "Chipotle");
 
     await waitFor(() => {
       expect(screen.getByText("Chipotle")).toBeInTheDocument();
@@ -51,19 +58,52 @@ describe("Search and Sort Transactions", () => {
     });
   });
 
-  it("filters transactions by search text", async () => {
+  it("filters transactions by search text, ignoring case", async () => {
     const user = userEvent.setup();
     render(<App />);
 
     await screen.findByText("Lyft Ride");
-
-    const searchInput = screen.getByPlaceholderText(
-      "Search your Recent Transactions"
-    );
-    await user.type(searchInput, "ride");
+    await searchFor(user, "ride");
 
     expect(await screen.findByText("Lyft Ride")).toBeInTheDocument();
     expect(screen.queryByText("Chipotle")).not.toBeInTheDocument();
+  });
+
+  it("filters transactions by category", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await screen.findByText("Chipotle");
+    await searchFor(user, "Income");
+
+    expect(screen.getByText("Paycheck from Bob's Burgers")).toBeInTheDocument();
+    expect(screen.queryByText("Chipotle")).not.toBeInTheDocument();
+  });
+
+  it("shows an empty state when search has no matches", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await screen.findByText("Chipotle");
+    await searchFor(user, "zzzz");
+
+    expect(
+      await screen.findByText("No transactions to display")
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Chipotle")).not.toBeInTheDocument();
+  });
+
+  it("shows all transactions again after the search is cleared", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await screen.findByText("Chipotle");
+    await searchFor(user, "Chipotle");
+    await searchFor(user, "");
+
+    expect(screen.getByText("Chipotle")).toBeInTheDocument();
+    expect(screen.getByText("Paycheck from Bob's Burgers")).toBeInTheDocument();
+    expect(screen.getByText("Lyft Ride")).toBeInTheDocument();
   });
 
   it("sorts transactions by description", async () => {
@@ -71,7 +111,6 @@ describe("Search and Sort Transactions", () => {
     render(<App />);
 
     await screen.findByText("Chipotle");
-
     await user.selectOptions(screen.getByRole("combobox"), "description");
 
     const rows = screen.getAllByRole("row").slice(1);
@@ -89,7 +128,6 @@ describe("Search and Sort Transactions", () => {
     render(<App />);
 
     await screen.findByText("Chipotle");
-
     await user.selectOptions(screen.getByRole("combobox"), "category");
 
     const rows = screen.getAllByRole("row").slice(1);

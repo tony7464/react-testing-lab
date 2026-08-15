@@ -250,6 +250,17 @@ button {
   color: var(--debit);
 }
 
+.status-error {
+  margin: 0;
+  color: var(--debit);
+  font-weight: 600;
+}
+
+.empty-note {
+  margin: 12px 10px 4px;
+  color: var(--muted);
+}
+
 @media (max-width: 800px) {
   .app-header,
   .toolbar {

@@ -19,12 +19,8 @@ const mockTransactions = [
 ];
 
 describe("Display Transactions", () => {
-  beforeEach(() => {
-    // Mock GET /transactions so tests do not hit the live json-server
-    setFetchResponse(mockTransactions);
-  });
-
   it("displays transactions on startup", async () => {
+    setFetchResponse(mockTransactions);
     render(<App />);
 
     await waitFor(() => {
@@ -34,6 +30,27 @@ describe("Display Transactions", () => {
 
     expect(screen.getByText("Income")).toBeInTheDocument();
     expect(screen.getByText("Food")).toBeInTheDocument();
-    expect(fetch).toHaveBeenCalled();
+    expect(screen.getByText("2019-12-01")).toBeInTheDocument();
+    expect(fetch).toHaveBeenCalledWith("http://localhost:6001/transactions");
+  });
+
+  it("shows an empty state when there are no transactions", async () => {
+    setFetchResponse([]);
+    render(<App />);
+
+    expect(
+      await screen.findByText("No transactions to display")
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Chipotle")).not.toBeInTheDocument();
+  });
+
+  it("shows an error when the transactions request fails", async () => {
+    global.fetch = vi.fn(() => Promise.reject(new Error("network")));
+    render(<App />);
+
+    expect(
+      await screen.findByText("Could not load transactions")
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Chipotle")).not.toBeInTheDocument();
   });
 });

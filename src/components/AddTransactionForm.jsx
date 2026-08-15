@@ -5,9 +5,14 @@ function AddTransactionForm({ postTransaction }) {
   function submitForm(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
+    const description = formData.get("description")?.trim();
+
+    // Skip empty submits so we do not POST blank rows
+    if (!description) return;
+
     const newTransaction = {
       date: formData.get("date"),
-      description: formData.get("description"),
+      description,
       category: formData.get("category"),
       amount: formData.get("amount"),
     };

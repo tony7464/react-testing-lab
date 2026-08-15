@@ -26,6 +26,9 @@ function TransactionsList({ transactions }) {
           {transactionComponent}
         </tbody>
       </table>
+      {transactions.length === 0 ? (
+        <p className="empty-note">No transactions to display</p>
+      ) : null}
     </div>
   );
 }
